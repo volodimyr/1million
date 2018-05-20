@@ -17,7 +17,7 @@ func (w *workRequest) DoWork() {
 }
 
 func main() {
-	wp, err := New(1000)
+	wp, err := New(5096)
 	if err != nil {
 		log.Fatalln(err)
 	}
