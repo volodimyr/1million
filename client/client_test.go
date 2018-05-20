@@ -9,7 +9,7 @@ type Event struct {
 	Token string `json:"token"`
 }
 
-func TestEvent(t *testing.T) {
+func TestMakeEvent(t *testing.T) {
 	var event Event
 	str := MakeEvent()
 	if len(str) == 0 {

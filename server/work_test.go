@@ -44,6 +44,33 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func BenchmarkNew(b *testing.B) {
+	b.StopTimer()
+	minRoutines := []struct {
+		name    string
+		howMany int64
+	}{
+		{"New 10 workers", 10},
+		{"New 100 workers", 100},
+		{"New 1000 workers", 1000},
+		{"New 10000 workers", 10000},
+	}
+
+	for _, mr := range minRoutines {
+		b.Run(mr.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				b.StartTimer()
+				pool, err := New(mr.howMany)
+				if err != nil {
+					b.Errorf("Function New must NOT return error if minRoutines == %d \n %v", mr.howMany, err)
+				}
+				b.StopTimer()
+				pool.Shutdown()
+			}
+		})
+	}
+}
+
 func TestWorkerPool_Add(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
@@ -66,6 +93,35 @@ func TestWorkerPool_Add(t *testing.T) {
 			t.Errorf("Expected active routines [%d], but got [%d]", tc.expectedRs, resPool.routines)
 		}
 		resPool.Shutdown()
+	}
+}
+
+func BenchmarkWorkerPool_Add(b *testing.B) {
+	b.StopTimer()
+	minRoutines := []struct {
+		name string
+		init int64
+		add  int64
+	}{
+		{"Add 10 workers", 1, 10},
+		{"Add 100 workers", 1, 100},
+		{"Add 1000 workers", 1, 1000},
+		{"Add 10000 workers", 1, 10000},
+	}
+
+	for _, mr := range minRoutines {
+		b.Run(mr.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				pool, err := New(mr.init)
+				if err != nil {
+					b.Errorf("Function New must NOT return error if minRoutines == %d \n %v", mr.init, err)
+				}
+				b.StartTimer()
+				pool.Add(mr.add)
+				b.StopTimer()
+				pool.Shutdown()
+			}
+		})
 	}
 }
 
@@ -92,6 +148,33 @@ func TestWorkerPool_Shutdown(t *testing.T) {
 		if err == nil {
 			t.Error("Shutdown can't be executed twice")
 		}
+	}
+}
+
+func BenchmarkWorkerPool_Shutdown(b *testing.B) {
+	b.StopTimer()
+	minRoutines := []struct {
+		name    string
+		howMany int64
+	}{
+		{"Shutdown 10 workers", 10},
+		{"Shutdown 100 workers", 100},
+		{"Shutdown 1000 workers", 1000},
+		{"Shutdown 10000 workers", 10000},
+	}
+
+	for _, mr := range minRoutines {
+		b.Run(mr.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				pool, err := New(mr.howMany)
+				if err != nil {
+					b.Errorf("Function New must NOT return error if minRoutines == %d \n %v", mr.howMany, err)
+				}
+				b.StartTimer()
+				pool.Shutdown()
+				b.StopTimer()
+			}
+		})
 	}
 }
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"sync/atomic"
 )
 
@@ -33,8 +32,6 @@ func New(minRoutines int64) (*WorkerPool, error) {
 
 	wp.waitShutdown()
 	wp.Add(minRoutines)
-
-	log.Println("WorkerPool is completely up and running")
 
 	return &wp, nil
 }
