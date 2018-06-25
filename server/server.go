@@ -2,18 +2,18 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"encoding/json"
 )
 
-type workRequest struct {
-	event []byte
+type WorkRequest struct {
+	Token string `json:"token"`
 }
 
-func (w *workRequest) DoWork() {
-	fmt.Println("Event:", string(w.event))
+func (w *WorkRequest) DoWork() {
+	fmt.Println("Event:", w.Token)
 }
 
 func main() {
@@ -35,12 +35,14 @@ func main() {
 func performHandler(wp *WorkerPool, w http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 	if req.Method == http.MethodPost {
-		v, err := ioutil.ReadAll(req.Body)
+		dec := json.NewDecoder(req.Body)
+		var event WorkRequest
+		err := dec.Decode(&event)
 		if err != nil {
 			http.Error(w, "Couldn't parse body", http.StatusBadRequest)
 			return
 		}
-		go wp.Run(&workRequest{event: v})
+		go wp.Run(&event)
 		w.WriteHeader(http.StatusCreated)
 		return
 	}
