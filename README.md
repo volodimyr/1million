@@ -1,7 +1,8 @@
 # 1million
 Server, client may potentially consumes, produces 1 million requests per minute respectively (depends on your machine)
 *keep in mind requests will be uniformly send within a minute
-
+## Discussions on reddit
+https://www.reddit.com/r/golang/comments/8torkz/1million_requests/
 ## Run tests within each directory (server/, client/)
 - Unit tests
   -`go test -v`
